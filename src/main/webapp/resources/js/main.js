@@ -74,19 +74,17 @@ document.getElementById("saveId").addEventListener("change", function(){
 // 회원 정보 조회 비동기 통신(AJAX)
 document.getElementById("select1").addEventListener("click", function(){
 
-    const input = document.getElementById("in1");
+    const input = document.getElementById("searchMember");
     const div = document.getElementById("result1");
 
 
     // AJAX 코드 작성(jQuery 방식) -> jQuery 라이브러리가 추가 되어 있는지 확인
     $.ajax({
         //    /community/member/selectOne
-        url : "member/selectOne",
+        url : "selectOne",
         data : {"memberEmail" : input.value},
         type : "POST",
-
-        dataType : "JSON",  // dataType : 응답데이터 형식을 지정
-                            // -> "JSON"으로 지정 시 자동으로 JS 객체로 변환
+        dataType : "JSON",
 
         success : function(member){ 
 

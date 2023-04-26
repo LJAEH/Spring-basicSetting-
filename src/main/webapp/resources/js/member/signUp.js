@@ -8,7 +8,7 @@ const checkObj = {
     "memberPwConfirm" : false,
     "memberNickname"  : false,
     "memberTel"       : false,
-    "sendEmail"       : false   // 인증번호 발송 체크
+ //   "sendEmail"       : false   // 인증번호 발송 체크
 };
 
 
@@ -157,7 +157,7 @@ memberNickname.addEventListener("input", function(){
 
         //     /community/member/nicknameDupCheck
         $.ajax({
-            url : "nicknameDupCheck",  // 필수 작성 속성
+            url : "nickDupCheck",  // 필수 작성 속성
             data : { "memberNickname" : memberNickname.value }, // 서버로 전달할 값(파라미터)
             type : "GET", // 데이터 전달 방식(기본값 GET)
 
@@ -261,6 +261,7 @@ function checkPw(){ // 비밀번호 일치 검사
         pwMessage.classList.remove("confirm");
 
         checkObj.memberPwConfirm = false; // 유효 X 기록
+
     }
 }
 

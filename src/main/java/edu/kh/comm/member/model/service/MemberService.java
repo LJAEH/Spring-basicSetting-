@@ -23,4 +23,20 @@ public interface MemberService {
 	 * @return loginMember
 	 */
 	public abstract Member login(Member inputMember);
+
+ 	/** 이메일 중복 검사
+	 * @param memberEmail
+	 * @return
+	 */
+	public abstract int emailDupCheck(String memberEmail);
+
+	/** 닉네임 중복 검사
+	 * @param memberNickname
+	 * @return
+	 */
+	public abstract int nickDupCheck(String memberNickname);
+
+	public abstract int signUp(Member member);
+
+	public abstract Member selectOne(String memberEmail);
 }

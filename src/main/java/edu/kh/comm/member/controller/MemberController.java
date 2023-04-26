@@ -1,13 +1,22 @@
 package edu.kh.comm.member.controller;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.kh.comm.member.model.service.MemberService;
 import edu.kh.comm.member.model.vo.Member;
@@ -25,6 +34,9 @@ import edu.kh.comm.member.model.vo.Member;
 
 @Controller // 생성된 bean이 Controller임을 명시 + bean 등록
 @RequestMapping("/member") // localhost:8080/comm/member 이하의 요청을 처리하는 컨트롤러
+@SessionAttributes({"loginMember"}) // java 배열로 작성 
+											// Model에 추가된 값의 key와 어노테이션에 작성된 값이 같으면
+											// 해당 값을 session scope로 이동시키는 역할
 public class MemberController {
 	
 	private Logger logger = LoggerFactory.getLogger(MemberController.class);
@@ -121,14 +133,76 @@ public class MemberController {
 	// - VO 필드에 대한 Setter
 	
 	 @PostMapping("/login") 
-	 public String login(@ModelAttribute Member inputMember) {
-	  
+	 public String login(/*@ModelAttribute*/ Member inputMember,
+			 				Model model,
+			 				RedirectAttributes ra,
+			 				HttpServletResponse resp,
+			 				HttpServletRequest req,
+			 				@RequestParam(value="saveId",required=false) String saveId
+			 ) {
+		 // 커맨드 객체
+		 // @ModelAttribute 생략된 상태에서 파라미터가 필드에 세팅된 객체
+
 		  logger.info("로그인 기능 수행됨");
 		  
 		  // 아이디, 비밀번호가 일치하는 회원 정보를 조회하는 Service 호출 후 결과 반환받기
 		  Member loginMember = service.login(inputMember);
+		  		 
+		 /* Model : 데이터를 맵형식 (K:V) 형태로 담아 전달하는 용도의 객체
+		  * => request, session을 대체하는 객체
+		  * - 기본 scope : request
+		  * - session scope로 변환하고 싶은 경우
+		  * 클래스 레벨로 @SessionAttributes 를 작성하면 된다.
+		  * 
+		  * @SessionAttributes 미작성 => request scope
+		  */
+		 if(loginMember != null) { // 로그인 성공 시
+			 model.addAttribute("loginMember", loginMember); 
+			 // == req.setAttribute("loginMember", loginMember);
+			 // 로그인 성공 시 무조건 쿠키 생성
+			 // 단, 아이디 저장 체크 여부에 따라서 쿠키의 유지시간을 조정
+			 
+			 Cookie cookie = new Cookie("saveId",loginMember.getMemberEmail());
+			 
+			 if( saveId != null ) { // 아이디 저장 체크 되었을때
+				 cookie.setMaxAge(60*60*24*365); // 초단위 지정(1년) 
+			 } else {
+				 cookie.setMaxAge(0); // 생성되자마자 사라짐
+			 }
+			 
+			 // 쿠키가 적용될 범위(경로) 지정
+			 cookie.setPath(req.getContextPath()); // comm 이하로 전부 적용 // 이러면 프로젝트 이름이 바뀌어도 항상 적용
+			 // 쿠키를 응답 시 클라이언트에게 전달
+			 resp.addCookie(cookie);
+			 
+		 } else {
+			 // model.addAttribute("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
+			 ra.addFlashAttribute("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
+				 
+			 // redirect 시에도 request scope로 세팅된 데이터가 유지될 수 있도록 하는 방법을 
+			 // spring에서 제공함
+			 // => RedirectAttributes 객체 (컨트롤러 매개변수에 작성하면 사용 가능)
+		 }
+		 
 		  return "redirect:/"; 
 	 }
+
+	 @GetMapping("/logout") 
+	 public String logout(SessionStatus status) {
+		 // 로그아웃 == 세션을 없애는 것
+		 
+		 // * @SessionAttributes를 이용해서 session scope에 배치된 데이터는
+		 //   SessionStatus 라는 별도 객체를 이용해야만 없앨 수 있다.
+		 
+		 logger.info("로갓");
+		 
+		 // HttpSession session // session.invalidate(); 기존 세션 무효화 방식으로는 x
+		 
+		 status.setComplete(); // 세션이 할 일이 완료됨 => 없앰
+		 
+	     return "redirect:/"; // 메인페이지 재요청
+	}
+		
 	 
 	 // 회원가입 화면 전환
 	 
@@ -140,7 +214,76 @@ public class MemberController {
 		 return "member/signUp";
 	 }
 	 
-		
-		
+	 // 이메일 중복 검사 메서드 
+	 
+	 @ResponseBody
+	 @GetMapping("/emailDupCheck")
+	 //public String emailDupCheck(@RequestParam("memberEmail") String memberEmail) { 
+	 public int emailDupCheck(String memberEmail) { // 파라미터 key값과 저장하려는 변수 명이 같으면 생략가능
+		 
+	
+		 // 컨트롤러에서 반환되는 값은 forward 또는 redirect 를 위한 경로인 경우가 일반적 
+		 // => 반환되는 값은 경로로 인식됨 (디스페쳐에 의해 뷰리졸버로 /WEB-INF/ .jsp 붙여서 경로로 쏨
+		 
+		 // -> 이를 해결하기 위한 어노테이션 @ResonseBody 가 존재함
+		 
+		 // @ResponseBody : 반환되는 값을 응답의 몸통(body)에 추가하여 
+		 //					이전 요청 주소로 돌아감
+		 // => 컨트롤러에서 반환되는 값이 경로가 아닌 "값 자체" 로 인식됨
+		 
+		 return service.emailDupCheck(memberEmail);
+	 }
+	 
+	 @ResponseBody
+	 @GetMapping("/nickDupCheck")
+	 public int nickDupCheck(String memberNickname) {
+		 return service.nickDupCheck(memberNickname);
+	 }
+	 
+	 
+	 @PostMapping("/signUp")
+	 public String signUp(RedirectAttributes ra, String memberEmail, String memberPw, String memberNickname, String memberTel,
+			 @RequestParam("postcode") String postcode,
+			 @RequestParam("address") String address,
+			 @RequestParam("detailAddress") String detailAddress
+			 ) {
+		 
+		 String memberAddress = postcode + address + detailAddress;
+		 
+		 Member member = new Member();
+		 member.setMemberEmail(memberEmail);
+		 member.setMemberPw(memberPw);
+		 member.setMemberNickname(memberNickname);
+		 member.setMemberTel(memberTel);
+		 member.setMemberAddress(memberAddress);
+		 
+		 int result = service.signUp(member);
+		 
+		 String resultWord = null;
+		 
+		 if(result == 1) {
+			 ra.addFlashAttribute("message", "안녕");
+		 } else {
+			 ra.addFlashAttribute("message", "당신은 실패했다");
+		 }
+		 
+		 return "redirect:/";
+				 
+	 }
+	 
+	 //회원 1명 정보 조회(ajax)
+	 @ResponseBody
+	 @PostMapping("/selectOne")
+	 public Member selectOne (RedirectAttributes ra, String memberEmail) {
+		 
+		 Member member = service.selectOne(memberEmail);
+		 
+		 return member;
+	 }
+	 
+	 
+	 
+	 //회원 목록 조회(ajax)
+	 
 	
 }
