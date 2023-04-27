@@ -1,5 +1,7 @@
 package edu.kh.comm.member.model.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,8 +113,23 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public Member selectOne(String memberEmail) {
+		
+		
+		Member member = dao.selectOne(memberEmail);
+		
+		if (member != null) {
+			return member;
+		} else {
+			return member;
+		}
+	}
+
+	@Override
+	public List<Member> selectAll() {
 		// TODO Auto-generated method stub
-		return dao.selectOne(memberEmail);
+		List<Member> memberList = dao.selectAll();
+		
+		return memberList;
 	}
 	
 

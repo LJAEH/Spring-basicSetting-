@@ -154,5 +154,12 @@
 		AND SECESSION_FL = 'N'
 	</select>
 	
+	<select id="selectAll" parameterType="member" resultMap="member_rm">
+		SELECT MEMBER_NO, MEMBER_EMAIL,MEMBER_NICK ,MEMBER_TEL,
+	    MEMBER_ADDR, ENROLL_DT , MEMBER_PW , PROFILE_IMG
+		FROM MEMBER_S
+		WHERE SECESSION_FL = 'N'
+	</select>
+	
 
 </mapper>

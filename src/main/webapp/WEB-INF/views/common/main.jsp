@@ -35,12 +35,11 @@
 
                 <p>이메일을 입력 받아 일치하는 회원 정보를 출력</p>
 
-                <form action="selectOne" method="POST">
-                    이메일 : <input type="text" id="searchMember" name="searchMember">
-                    <button id="select1"  type="submit">조회</button>
-                    <div id="result1" style="height:150px"></div>
-                </form>
-                
+                이메일 : <input type="text" id="in1" name="searchMember">
+                <button id="select1">조회</button>
+                <div id="result1" style="height:150px"></div>
+
+            
                 <hr>
 
                 <h3>회원 목록 조회</h3>

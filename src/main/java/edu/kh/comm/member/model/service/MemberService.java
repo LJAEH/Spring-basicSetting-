@@ -1,5 +1,7 @@
 package edu.kh.comm.member.model.service;
 
+import java.util.List;
+
 import edu.kh.comm.member.model.vo.Member;
 
 //서비스는 왜 나눠서 쓸가? (interface, class)
@@ -39,4 +41,6 @@ public interface MemberService {
 	public abstract int signUp(Member member);
 
 	public abstract Member selectOne(String memberEmail);
+
+	public abstract List<Member> selectAll();
 }

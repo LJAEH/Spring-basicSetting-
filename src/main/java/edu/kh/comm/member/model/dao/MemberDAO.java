@@ -1,5 +1,7 @@
 package edu.kh.comm.member.model.dao;
 
+import java.util.List;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,5 +62,10 @@ public class MemberDAO {
 	public Member selectOne(String memberEmail) {
 		
 		return sqlSession.selectOne("memberMapper.selectOne",memberEmail);
+	}
+
+	public List<Member> selectAll() {
+		
+		return sqlSession.selectList("memberMapper.selectAll");
 	}
 }
