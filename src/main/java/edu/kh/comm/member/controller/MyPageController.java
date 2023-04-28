@@ -2,18 +2,18 @@ package edu.kh.comm.member.controller;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.kh.comm.member.model.service.MyPageService;
@@ -48,10 +48,13 @@ public class MyPageController {
 	@PostMapping("/changePw")
 	public String changePw(RedirectAttributes ra ,
 			@ModelAttribute("loginMember") Member loginMember ,
-			String currentPw , String newPw) {
+			@RequestParam("currentPw") String currentPw , 
+			@RequestParam("newPw") String newPw) {
 		
 		// session 확인
 		logger.debug(loginMember.toString());
+		logger.debug(newPw);
+		logger.debug(currentPw);
 		
 		int result = service.changePw(loginMember,currentPw,newPw);
 		
@@ -66,23 +69,40 @@ public class MyPageController {
 		
 
 	}
-	
+
+	// 회원 탈퇴
 	@GetMapping("/secession")
 	public String secession() {
 		return "member/myPage-secession";
 	}
 	
-	
-	
-	// 회원 탈퇴
-	
+	@PostMapping("/secession")
+	public String secession(RedirectAttributes ra,
+			@ModelAttribute("loginMember") Member loginMember,
+			@RequestParam("memberPw") String memberPw,
+			SessionStatus status) {
+		
+		loginMember.setMemberPw(memberPw);
+		
+		int result = service.secession(loginMember);
+		
+		if (result == 1) {
+			ra.addFlashAttribute("message","getOut");
+			status.setComplete();
+			return "redirect:/";	
+		} else {
+			ra.addFlashAttribute("message", "실패햇서요");
+			return "member/myPage-secession";
+		}	
+	}
 	
 	// 회원 정보 수정
 	@PostMapping("/info")
 	public String updateInfo(@ModelAttribute("loginMember") Member loginMember ,
 			@RequestParam Map<String, Object> paramMap,
-			String[] updateMemberAddress,
-			RedirectAttributes ra
+			@RequestParam("updateMemberAddress") String[] updateMemberAddress,
+			RedirectAttributes ra ,
+			Model model
 	)  {
 		
 		// 필요한 값
@@ -93,7 +113,7 @@ public class MyPageController {
 		//		=> @ModelAttribute, @SessionAttributes 필요
 		
 		// @SessionAttributes의 역할 2가지
-		// 1) Model 에 세팅 데이터의 key값을 @SessionAttributes에 작성하면
+		// 1) Model에 세팅 데이터의 key값을 @SessionAttributes에 작성하면
 		//   해당 key값과 같은 Model 에 세팅된 데이터를 request => session scope 로 이동
 		
 		// 2) 기존에 session scope 로 이동시킨 값을 얻어오는 역할
@@ -114,21 +134,27 @@ public class MyPageController {
 		
 		// [해결 방법] 파라미터의 name 속성을 변경해서 얻어오면 문제해결
 		// (필드명이 겹쳐서 문제니까 바꿔주삼)
-		String newAddress = null;
 		
-		int memberNo = loginMember.getMemberNo();
-		if(updateMemberAddress != null) {
-			newAddress = String.join(null, updateMemberAddress);
+		int result = 0;
+		loginMember.setMemberNickname((String)paramMap.get("updateMemberNickname"));
+		loginMember.setMemberTel((String)paramMap.get("updateMemberTel"));
+		loginMember.setMemberAddress((String)paramMap.get("updateMemberAddress"));
+		logger.debug(loginMember.getMemberNickname() 
+				+ loginMember.getMemberTel() 
+				+ loginMember.getMemberAddress());
+		
+		result = service.updateInfo(loginMember);
+		
+		if (result == 1 ) {
+			ra.addFlashAttribute("message", "수정되었습니다.");
+			model.addAttribute("loginMember", loginMember);
+			return "member/myPage-info";	
 		} else {
-			updateMemberAddress = null;
-			newAddress = String.join(null, updateMemberAddress);
+			ra.addFlashAttribute("message", "수정실패.");
+			return "member/myPage-info";
+			
 		}
 		
-		logger.debug(newAddress);
-		
-		int result = service.updateInfo(memberNo,paramMap,newAddress);
-		
-		return null;
-		
+			
 	}
 }
