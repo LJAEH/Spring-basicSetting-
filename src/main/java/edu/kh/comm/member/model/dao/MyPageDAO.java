@@ -18,12 +18,6 @@ public class MyPageDAO {
 	
 	private Logger logger = LoggerFactory.getLogger(MyPageDAO.class);
 	
-	public int updateInfo(int memberNo, Map<String, Object> paramMap, String newAddress) {
-		// TODO Auto-generated method stub
-		
-		
-		return 0;
-	}
 
 
 	public int changePw(Member loginMember) {
@@ -44,9 +38,11 @@ public class MyPageDAO {
 	}
 
 
-	public int updateInfo(Member loginMember) {
-		
-		return sqlSession.update("myPageMapper.updateInfo",loginMember);
+	
+	public int updateInfo(Map<String, Object> paramMap) {
+			
+		return sqlSession.update("myPageMapper.updateInfo",paramMap);
 	}
+
 
 }

@@ -102,13 +102,13 @@ public class MemberServiceImpl implements MemberService{
 	
 	
 	@Override
-	public int signUp(Member member) {
+	public int signUp(Member inputMember) {
 		
-		String bcryptPw = bcrypt.encode(member.getMemberPw());
+		String bcryptPw = bcrypt.encode(inputMember.getMemberPw());
 		
-		member.setMemberPw(bcryptPw);
+		inputMember.setMemberPw(bcryptPw);
 
-		return dao.signUp(member);
+		return dao.signUp(inputMember);
 	}
 
 	@Override

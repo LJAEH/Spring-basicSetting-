@@ -38,7 +38,7 @@ public interface MemberService {
 	 */
 	public abstract int nickDupCheck(String memberNickname);
 
-	public abstract int signUp(Member member);
+	public abstract int signUp(Member inputMember);
 
 	public abstract Member selectOne(String memberEmail);
 

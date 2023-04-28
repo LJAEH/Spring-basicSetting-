@@ -11,6 +11,6 @@ public interface MyPageService {
 
 	public abstract int secession(Member loginMember);
 
-	public abstract int updateInfo(Member loginMember);
+	public abstract int updateInfo(Map<String, Object> paramMap);
 
 }

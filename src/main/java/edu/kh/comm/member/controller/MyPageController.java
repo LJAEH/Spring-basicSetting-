@@ -2,6 +2,10 @@ package edu.kh.comm.member.controller;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +84,10 @@ public class MyPageController {
 	public String secession(RedirectAttributes ra,
 			@ModelAttribute("loginMember") Member loginMember,
 			@RequestParam("memberPw") String memberPw,
-			SessionStatus status) {
+			SessionStatus status,
+			HttpServletRequest req,
+			HttpServletResponse resp
+			) {
 		
 		loginMember.setMemberPw(memberPw);
 		
@@ -89,6 +96,11 @@ public class MyPageController {
 		if (result == 1) {
 			ra.addFlashAttribute("message","getOut");
 			status.setComplete();
+			
+			Cookie cookie = new Cookie("saveId","");
+			cookie.setMaxAge(0);
+			cookie.setPath(req.getContextPath());
+			resp.addCookie(cookie);
 			return "redirect:/";	
 		} else {
 			ra.addFlashAttribute("message", "실패햇서요");
@@ -135,25 +147,32 @@ public class MyPageController {
 		// [해결 방법] 파라미터의 name 속성을 변경해서 얻어오면 문제해결
 		// (필드명이 겹쳐서 문제니까 바꿔주삼)
 		
-		int result = 0;
-		loginMember.setMemberNickname((String)paramMap.get("updateMemberNickname"));
-		loginMember.setMemberTel((String)paramMap.get("updateMemberTel"));
-		loginMember.setMemberAddress((String)paramMap.get("updateMemberAddress"));
-		logger.debug(loginMember.getMemberNickname() 
-				+ loginMember.getMemberTel() 
-				+ loginMember.getMemberAddress());
+		// 파라미터를 저장한 paramMap에 회원번호, 주소를 추가
 		
-		result = service.updateInfo(loginMember);
+		String memberAddress = String.join(",,", updateMemberAddress);
+		if(memberAddress.equals(",,,,")) {
+			memberAddress = null;
+		}
 		
-		if (result == 1 ) {
+		paramMap.put("memberNo",loginMember.getMemberNo());
+		paramMap.put("memberAddress", memberAddress);
+		
+		int result = service.updateInfo(paramMap);
+		
+		if (result > 0) {
 			ra.addFlashAttribute("message", "수정되었습니다.");
-			model.addAttribute("loginMember", loginMember);
+			
+			loginMember.setMemberNickname((String)paramMap.get("updateMemberNickName"));
+			loginMember.setMemberTel((String)paramMap.get("updateMemberTel"));
+			loginMember.setMemberAddress((String)paramMap.get("memberAddress"));
+			
 			return "member/myPage-info";	
 		} else {
 			ra.addFlashAttribute("message", "수정실패.");
 			return "member/myPage-info";
 			
 		}
+		
 		
 			
 	}

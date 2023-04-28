@@ -137,9 +137,9 @@ public class MemberController {
 	// - VO 필드에 대한 Setter
 	
 	 @PostMapping("/login") 
-	 public String login(/*@ModelAttribute*/ Member inputMember,
+	 public String login(/*@ModelAttribute*/ Member inputMember, // 변수명 같으면 생략가능
 			 				Model model,
-			 				RedirectAttributes ra,
+			 				RedirectAttributes ra, // 리다이렉트 될때 잠깐 세션에 올렷다가 리퀴스트로 가져오기 위해 사용 (메시지)
 			 				HttpServletResponse resp,
 			 				HttpServletRequest req,
 			 				@RequestParam(value="saveId",required=false) String saveId
@@ -246,33 +246,45 @@ public class MemberController {
 	 
 	 
 	 @PostMapping("/signUp")
-	 public String signUp(RedirectAttributes ra, String memberEmail, String memberPw, String memberNickname, String memberTel,
-			 @RequestParam("postcode") String postcode,
-			 @RequestParam("address") String address,
-			 @RequestParam("detailAddress") String detailAddress
+	 public String signUp(RedirectAttributes ra, 
+			 	Member inputMember,
+				String[] memberAddress
 			 ) {
+		 // 커맨드 객체를 이용해서 입력된 회원 정보를 잘 받아옴m
+		 // 단, 같은 name 을 가진 주소가 하나의 문자열로 합쳐서 세팅되어 들어옴.
+		 // => 도로명 주소에 "," 기호가 포함되는 경우가 있어 이를 구분자로 사용할 수 없다.
 		 
-		 String memberAddress = postcode + address  + detailAddress;
+		 inputMember.setMemberAddress(String.join(",,", memberAddress));
+		
+		 // String.join은("구분자", 배열)
+		 // 배열을 하나의 문자열로 합치는 메서드
+		 // 값 중간중간에 들어가서 하나의 문자열로 합쳐줌
+		 // [a,b,c] => join진행 => "a,,b,,c"
 		 
-		 Member member = new Member();
-		 member.setMemberEmail(memberEmail);
-		 member.setMemberPw(memberPw);
-		 member.setMemberNickname(memberNickname);
-		 member.setMemberTel(memberTel);
-		 member.setMemberAddress(memberAddress);
+		 if(inputMember.getMemberAddress().equals(",,,,")) {
+			 inputMember.setMemberAddress(null);
+		 }
 		 
-		 int result = service.signUp(member);
+		 
+		 
+		 int result = service.signUp(inputMember);
 		 
 		 String resultWord = null;
 		 
-		 if(result == 1) {
-			 ra.addFlashAttribute("message", "안녕");
-		 } else {
-			 ra.addFlashAttribute("message", "당신은 실패했다");
-		 }
+		 String path = null;
+		 String message = null;
 		 
+		 if(result == 1) {
+			 message = "안뇽";
+			 path = "redirect:/";
+		 } else {
+			 message = "다시";
+			 path = "redirect:/member/signUp";
+		 }
+		 ra.addFlashAttribute("message", path);
+ 
 		 return "redirect:/";
-				 
+
 	 }
 	 
 	 //회원 1명 정보 조회(ajax)

@@ -32,12 +32,18 @@
 		WHERE MEMBER_NO = #{memberNo}
 	</update>
 	
-	<update id="updateInfo" parameterType="member">
+	<!-- parametorType 이 map 인경우 
+		1) parametorType = "java.util.Map"
+		2) parametorType = "map" (별칭)
+		3) 생략 (TypeHandler가 알아서 지정해줌)
+	-->
+	
+	<update id="updateInfo">
 		UPDATE MEMBER_S
-		SET MEMBER_NICK = #{memberNickname} ,
-		MEMBER_TEL = #{memberTel},
+		SET MEMBER_NICK = #{updateMemberNickname},
+		MEMBER_TEL = #{updateMemberTel},
 		MEMBER_ADDR = #{memberAddress}
-		WHERE MEMBER_NO = #{memberNo}
+		WHERE MEMBER_NO = ${memberNo}
 	</update>
 	 
 </mapper>

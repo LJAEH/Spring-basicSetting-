@@ -125,17 +125,17 @@
                  </label>
                  
                  <div class="signUp-input-area">
-                     <input type="text" id="sample6_postcode" name="postcode"
+                     <input type="text" id="sample6_postcode" name="memberAddress"
                              placeholder="우편번호">
                      <button type="button" onclick="sample6_execDaumPostcode()">검색</button>
                  </div>
  
                  <div class="signUp-input-area">
-                     <input type="text" id="sample6_address" name="address" placeholder="도로명주소">
+                     <input type="text" id="sample6_address" name="memberAddress" placeholder="도로명주소">
                  </div>
  
                  <div class="signUp-input-area">
-                     <input type="text" id="sample6_detailAddress" name="detailAddress" placeholder="상세주소">
+                     <input type="text" id="sample6_detailAddress" name="memberAddress" placeholder="상세주소">
                  </div>
                  <!-- <div class="signUp-input-area">
                      <input type="text" id="sample3_extraAddress" name="memberAddress" placeholder="참고항목">

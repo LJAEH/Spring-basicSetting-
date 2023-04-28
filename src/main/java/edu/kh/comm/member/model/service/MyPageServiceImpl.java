@@ -69,9 +69,9 @@ public class MyPageServiceImpl implements MyPageService{
 
 
 	@Override
-	public int updateInfo(Member loginMember) {
+	public int updateInfo(Map<String, Object> paramMap) {
 		
-		return dao.updateInfo(loginMember);
+		return dao.updateInfo(paramMap);
 	}
 
 }

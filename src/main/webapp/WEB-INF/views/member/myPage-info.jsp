@@ -64,19 +64,19 @@
                     <div class="myPage-row info-title">
                         <span>주소</span>
                     </div>
-
+                    
                     <div class="myPage-row info-address">
-                        <input type="text" name="updateMemberAddress"  value="${addr[0]}"  maxlength="6">
+                        <input type="text" id="postcode" name="updateMemberAddress"  value="${addr[0]}"  maxlength="6">
 
-                        <button type="button" id="info-address-btn">검색</button>
+                        <button type="button" id="info-address-btn" onclick="return execDaumPostcode()">검색</button>
                     </div>
 
                     <div class="myPage-row info-address">
-                        <input type="text" name="updateMemberAddress" value="${addr[1]}">
+                        <input type="text" id="address" name="updateMemberAddress" value="${addr[1]}">
                     </div>
                     
                     <div class="myPage-row info-address">
-                        <input type="text" name="updateMemberAddress" value="${addr[2]}">
+                        <input type="text" id="detailAddress" name="updateMemberAddress" value="${addr[2]}">
                     </div>
 
                     <button id="info-update-btn">수정하기</button>
@@ -88,12 +88,16 @@
 
 	<jsp:include page="/WEB-INF/views/common/footer.jsp"/>
 
-    <!-- myPage.js 추가 -->
-    <script src="${contextPath}/resources/js/member/myPage.js"></script>
+    
+    <div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:11;-webkit-overflow-scrolling:touch;">
+        <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+    </div>
 
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    
     <script>
-
-        // 다음 주소 API
+            
+    // 다음 주소 API
 
     // 우편번호 찾기 화면을 넣을 element
     var element_layer = document.getElementById('layer');
@@ -159,8 +163,11 @@
         element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
     }
 
-
     </script>
+
+    <!-- myPage.js 추가 -->
+    <script src="${contextPath}/resources/js/member/myPage.js"></script>
+    
 
 </body>
 </html>

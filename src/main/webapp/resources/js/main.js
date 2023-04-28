@@ -74,7 +74,7 @@ document.getElementById("saveId").addEventListener("change", function(){
 // 회원 정보 조회 비동기 통신(AJAX)
 document.getElementById("select1").addEventListener("click", function(){
 
-    const input = document.getElementById("in1");
+    const input = document.getElementById("in1`");
     const div = document.getElementById("result1");
 
 
