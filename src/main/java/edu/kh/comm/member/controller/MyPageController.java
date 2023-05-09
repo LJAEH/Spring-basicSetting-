@@ -1,5 +1,6 @@
 package edu.kh.comm.member.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.kh.comm.member.model.service.MyPageService;
@@ -36,6 +38,51 @@ public class MyPageController {
 	public String profile() {
 		return "member/myPage-profile";
 	}
+
+	
+	// 프로필 수정
+	@PostMapping("/profile")
+	public String updateProfile(@ModelAttribute("loginMember") Member loginMember,
+								@RequestParam("uploadImage") MultipartFile uploadImage, /* 업로일 파일 */
+								@RequestParam Map<String, Object> map, /* delete 담겨있음 */
+								HttpServletRequest req, /* 파일 저장 경로 탐색용 */
+								RedirectAttributes ra ) throws IOException{
+		
+		
+		// 경로 작성하기
+		
+		// 1) 웹 접근 경로 ( /comm/resources/images/memberProfile/ )
+		String webPath = "/resources/images/memberProfile/";
+		
+		// 2) 서버 저장 폴더 경로 (C:\workspace\7_Framework\comm\src\main\webapp\resources\images\memberProfile)
+		String folderPath = req.getSession().getServletContext().getRealPath(webPath);
+		
+		// map에 경로2개, 이미지, delete, 회원번호 담기
+		map.put("webPath", webPath);
+		map.put("folderPath", folderPath);
+		map.put("uploadImage", uploadImage);
+		map.put("memberNo", loginMember.getMemberNo());
+		
+		int result = service.updateProfile(map);
+		
+		String message = null;
+		
+		if(result > 0) {
+			message = "프로필 이미지가 변경되었습니다";
+			
+			loginMember.setProfileImage( (String)map.get("profileImage") );
+			
+		} else {
+			message = "프로필 이미지 변경 실패";
+		}
+		
+		ra.addFlashAttribute("message", message);
+		
+		return "redirect:profile";
+		
+	}
+	
+	
 	
 	// 회원 정보 조회
 	@GetMapping("/info")

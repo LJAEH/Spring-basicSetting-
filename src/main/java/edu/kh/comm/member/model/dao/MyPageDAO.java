@@ -45,4 +45,15 @@ public class MyPageDAO {
 	}
 
 
+	/** 프로필 이미지 수정
+	 * @param map
+	 * @return result
+	 */
+	public int updateProfile(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("myPageMapper.updateProfile", map);
+	}
+	
+
+
 }
