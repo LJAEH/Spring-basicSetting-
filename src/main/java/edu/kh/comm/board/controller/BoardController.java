@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,22 +21,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.kh.comm.board.model.service.BoardService;
+import edu.kh.comm.board.model.service.ReplyService;
 import edu.kh.comm.board.model.vo.BoardDetail;
+import edu.kh.comm.board.model.vo.Reply;
 import edu.kh.comm.common.Util;
 import edu.kh.comm.member.model.vo.Member;
 
 @Controller
-@SessionAttributes ({"loginMember"})
+@SessionAttributes({"loginMember"})
 @RequestMapping("/board")
 public class BoardController {
 	
 	@Autowired
 	private BoardService service;
+	
+	@Autowired
+	private ReplyService rService;
+	
+	private Logger logger = LoggerFactory.getLogger(BoardController.class);
+	
 	
 	//게시글 목록 조회
 	// @PathVariable("value") : URL 경로에 포함되어 있는 값을 변수로 사용할 수 있게하는 역할
@@ -52,7 +63,6 @@ public class BoardController {
 		// 1) 게시판 이름 조회 => 인터셉터에 application에 올려둔 boardTypeList를 사용 가능
 		// 2) 페이지네이션 객체 생성 (listCount)
 		// 3) 게시글 목록 조회
-		
 		
 		
 		Map<String,Object> map = null;
@@ -115,7 +125,10 @@ public class BoardController {
 		
 		if(detail != null) {
 			
-			// 댓글 목록 조회
+			/*
+			 * // 댓글 목록 조회 List<Reply> rList = rService.replyList(boardNo);
+			 * model.addAttribute("rList", rList);
+			 */
 			
 			// 세션이 있는지 없는지
 			// 세션이 있으면 memberNo 세팅
@@ -308,25 +321,8 @@ public class BoardController {
 			
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	
 		
 	}	
+	
 }
