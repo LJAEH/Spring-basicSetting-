@@ -170,4 +170,10 @@ public class BoardDAO {
 	}
 
 
+	public List<String> selectDBList() {
+		// TODO Auto-generated method stub
+		return sqlSession.selectList("boardMapper.selectDBList");
+	}
+
+
 }

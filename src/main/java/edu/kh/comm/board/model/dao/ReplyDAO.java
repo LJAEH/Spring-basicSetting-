@@ -31,4 +31,22 @@ public class ReplyDAO {
 		return sqlSession.insert("replyMapper.insert",reply);
 	}
 
+	/** 댓글 수정 DAO
+ 	 * @param reply
+	 * @return
+	 */
+	public int updateReply(Reply reply) {
+		return sqlSession.update("replyMapper.update",reply);
+		
+	}
+
+	/** 댓글 삭제 DAO
+	 * @param boardNo
+	 * @return
+	 */
+	public int deleteReply(int boardNo) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("replyMapper.delete",boardNo);
+	}
+
 }

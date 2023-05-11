@@ -255,6 +255,12 @@ public class BoardServiceImpl implements BoardService{
 
 		return result;
 	}
+
+	@Override
+	public List<String> selectDBList() {
+		// TODO Auto-generated method stub
+		return dao.selectDBList();
+	}
 	
 
 
