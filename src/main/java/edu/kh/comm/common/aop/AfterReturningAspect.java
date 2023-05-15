@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Aspect
-@Order(5) // advice 실행 순서 클 수록 먼저 싲가 
+@Order(5) // advice 실행 순서 클 수록 먼저 시작
 public class AfterReturningAspect {
 	
 	private Logger logger = LoggerFactory.getLogger(AfterReturningAspect.class);
